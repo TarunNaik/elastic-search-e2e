@@ -1,5 +1,6 @@
 package com.tsoft.poc.elastic.service;
 
+import com.tsoft.poc.elastic.annotation.LogExecutionTime;
 import com.tsoft.poc.elastic.document.Product;
 import com.tsoft.poc.elastic.dto.ProductRequest;
 import com.tsoft.poc.elastic.dto.ProductResponse;
@@ -15,6 +16,7 @@ public class ProductService {
 
     private final ElasticSearchRepository elasticSearchRepository;
 
+    @LogExecutionTime
     public ProductResponse save(ProductRequest productRequest) {
         Product product = new Product(UUID.randomUUID(), productRequest.name(),
                 productRequest.description(), productRequest.category(), productRequest.price());
@@ -25,6 +27,12 @@ public class ProductService {
 
     public ProductResponse findById(String id) {
         Product product = elasticSearchRepository.findById(UUID.fromString(id)).orElseThrow();
+        return new ProductResponse(product.getId().toString(),
+                product.getName(), product.getDescription(), product.getCategory(), product.getPrice());
+    }
+
+    public ProductResponse findByName(String name) {
+        Product product = elasticSearchRepository.findByName(name).orElseThrow();
         return new ProductResponse(product.getId().toString(),
                 product.getName(), product.getDescription(), product.getCategory(), product.getPrice());
     }
